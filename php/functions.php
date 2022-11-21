@@ -45,6 +45,50 @@ function check_user() {
 	}
 }
 
+function check_poll_user() {
+	global $pdo;
+	if(!isset($_SESSION['userid']) && isset($_COOKIE['poll_identifier']) && isset($_COOKIE['poll_securitytoken'])) {
+		$identifier = $_COOKIE['poll_identifier'];
+		$securitytoken = $_COOKIE['poll_securitytoken'];
+		$stmt = $pdo->prepare("SELECT * FROM poll_securitytokens WHERE identifier = ?");
+		$stmt->bindValue(1, $identifier);
+		$result = $stmt->execute();
+		if (!$result) {
+			exit;
+		}
+		$securitytoken_row = $stmt->fetch();
+		if(sha1($securitytoken) !== $securitytoken_row['securitytoken']) {
+			exit;
+		} else { //Token war korrekt
+			//Setze neuen Token
+			$neuer_securitytoken = md5(uniqid());
+			$stmt = $pdo->prepare("UPDATE poll_securitytokens SET securitytoken = ? WHERE identifier = ?");
+			$stmt->bindValue(1, sha1($neuer_securitytoken));
+			$stmt->bindValue(2, $identifier);
+			$result = $stmt->execute();
+			if (!$result) {
+				exit;
+			}
+			setcookie("poll_identifier",$identifier,time()+(3600*24*90),'/'); //90 Tage Gültigkeit
+			setcookie("poll_securitytoken",$neuer_securitytoken,time()+(3600*24*90),'/'); //90 Tage Gültigkeit
+			//Logge den Benutzer ein
+			$_SESSION['userid'] = $securitytoken_row['user_id'];
+		}
+		if(!isset($_SESSION['userid'])) {
+			return FALSE;
+		} else {
+			$stmt = $pdo->prepare("SELECT * FROM poll_users WHERE poll_user_id = ?");
+			$stmt->bindValue(1, $_SESSION['userid'], PDO::PARAM_INT);
+			$result = $stmt->execute();
+			if (!$result) {
+				error_log("Error while pulling poll_user with id: " + $_SESSION['userid'] + " from Database");
+			}
+			$user = $stmt->fetch();
+			return $user;
+		}
+	}
+}
+
 function sqlError($error_msg) {
 	global $pdo;
 	$backtrace = debug_backtrace();
