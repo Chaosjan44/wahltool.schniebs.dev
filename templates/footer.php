@@ -1,11 +1,11 @@
 <?php
 $crdate = "2022";
 ?>
-
+    </div>
 </body>
 
 <?php if (!isMobile()): ?>
-    <footer class="container-fluid cbg2 footer py-3">
+    <footer class="container-fluid cbg2 footer py-3 sticky-bottom">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-2 text-start">

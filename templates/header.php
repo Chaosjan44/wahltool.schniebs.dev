@@ -80,6 +80,7 @@ session_start();
 
 
 <body class="body">
+    <div class="body<?php if (isMobile()) print('_mobile');?>">
 
 
 <?php 
