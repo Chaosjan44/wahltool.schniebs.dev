@@ -9,7 +9,7 @@ if ($user == false) {
 require_once("templates/header.php"); ?>
 
 <div class="container py-3">
-    <div style="min-height: 80vh;">
+    <div>
         <div class="card cbg2 my-3 py-3 px-3">
             <div class="card-body text-center">
                 <h1 class="card-title display-3 text-center mb-4 text-kolping-orange">Interner Bereich</h1>

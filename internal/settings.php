@@ -43,7 +43,7 @@ if(isset($_POST['action'])) {
 }
 require_once("templates/header.php"); 
 ?>
-<div class="px-3 py-3" style="min-height: 80vh;">
+<div class="px-3 py-3">
     <h1>Einstellungen</h1>
     <div>
         <form action="settings.php" method="post">

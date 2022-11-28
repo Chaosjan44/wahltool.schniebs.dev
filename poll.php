@@ -53,7 +53,7 @@ if (isset($_POST['action'])) {
 $poll_user = check_poll_user();
 if ($poll_user == false) {
     require_once("templates/header.php"); ?>
-    <div class="container py-3" style="min-height: 80vh;">
+    <div class="container py-3">
         <div class="row justify-content-center">
             <div class="col">
                 <div class="card cbg2">

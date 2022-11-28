@@ -92,7 +92,7 @@ if(isset($_POST['action'])) {
         require_once("templates/header.php");
         ?>
         <!-- Formular zur Bearbeitung des Users anzeigen -->
-        <div class="px-3 py-3" style="min-height: 80vh;">
+        <div class="px-3 py-3">
             <h1>Einstellungen</h1>
             <div>
                 <form action="user.php" method="post">
@@ -110,7 +110,7 @@ if(isset($_POST['action'])) {
                                 <div class="input-group justify-content-center">
                                     <label for="perm_admin" class="input-group-text">Admin Berechtigungen?</label>
                                     <div class="input-group-text">
-                                        <input value="remember-me" id="perm_admin" type="checkbox" name="perm_admin" value="1" class="form-check-input checkbox-kolping" <?php if ($user1[0]['perm_admin'] == 1) print("checked");?>>
+                                        <input value="remember-me" id="perm_admin" type="checkbox" name="perm_admin" value="1" class="form-check-input checkbox-kolping mt-0" <?php if ($user1[0]['perm_admin'] == 1) print("checked");?>>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +144,7 @@ if(isset($_POST['action'])) {
 }
 require_once("templates/header.php"); 
 ?>
-<div class="container users content-wrapper py-3 px-3" style="min-height: 80vh;">
+<div class="container users content-wrapper py-3 px-3">
     <div class="row">
         <div class="py-3 px-3 cbg ctext rounded">
             <div class="d-flex justify-content-between">

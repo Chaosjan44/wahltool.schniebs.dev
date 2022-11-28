@@ -82,7 +82,7 @@ CREATE TABLE `options` (
   `option_id` int(10) NOT NULL AUTO_INCREMENT,
   `question_id` int(10) NOT NULL,
   `option_name` text NOT NULL,
-  `votes` int(8) NOT NULL,
+  `votes` int(8),
   PRIMARY KEY (`option_id`),
   FOREIGN KEY (`question_id`) REFERENCES `questions` (`question_id`)
 )

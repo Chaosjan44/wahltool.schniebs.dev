@@ -43,7 +43,7 @@ if (isset($_POST['action'])) {
 }
 include_once("templates/header.php");
 ?>
-<div class="container py-3" style="min-height: 80vh;">
+<div class="container py-3">
 	<div class="row justify-content-center">
 		<div class="col">
 			<div class="card cbg2">
@@ -76,7 +76,7 @@ include_once("templates/header.php");
                                 <div class="input-group justify-content-center">
                                     <label for="perm_admin" class="input-group-text">Admin Berechtigungen?</label>
                                     <div class="input-group-text">
-                                        <input value="perm_admin" id="perm_admin" type="checkbox" name="perm_admin" value="0" class="form-check-input checkbox-kolping">
+                                        <input value="perm_admin" id="perm_admin" type="checkbox" name="perm_admin" value="0" class="form-check-input checkbox-kolping mt-0">
                                     </div>
                                 </div>
                             </div>
