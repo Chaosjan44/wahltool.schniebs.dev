@@ -72,12 +72,12 @@ function check_poll_user() {
 			setcookie("poll_identifier",$identifier,time()+(3600*24*90),'/'); //90 Tage Gültigkeit
 			setcookie("poll_securitytoken",$neuer_securitytoken,time()+(3600*24*90),'/'); //90 Tage Gültigkeit
 			//Logge den Benutzer ein
-			$_SESSION['userid'] = $securitytoken_row['user_id'];
+			$_SESSION['userid'] = $securitytoken_row['poll_user_id'];
 		}
 		if(!isset($_SESSION['userid'])) {
 			return FALSE;
 		} else {
-			$stmt = $pdo->prepare("SELECT * FROM poll_users WHERE poll_user_id = ?");
+			$stmt = $pdo->prepare("SELECT * FROM polls_users WHERE poll_user_id = ?");
 			$stmt->bindValue(1, $_SESSION['userid'], PDO::PARAM_INT);
 			$result = $stmt->execute();
 			if (!$result) {
@@ -148,6 +148,16 @@ function check_cookie() {
 	} else {
 		return false;
 	}
+}
+
+function generateRandomString($length) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
 }
 
 $dateMMM = new IntlDateFormatter('de_DE', IntlDateFormatter::FULL, IntlDateFormatter::NONE, pattern:'MMM');

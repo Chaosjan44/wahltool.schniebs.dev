@@ -209,7 +209,7 @@ require("templates/header.php");
                                         <div><?=$poll['poll_name']?></div>
                                     </td>
                                     <td class="border-0 text-center">
-                                        <div>https://wahltool.schniebs.dev/poll?uni=<?=$poll['poll_unique']?></div>
+                                        <div>https://wahltool.schniebs.dev/poll.php?uni=<?=$poll['poll_unique']?></div>
                                     </td>
                                     <td class="border-0 actions text-center">
                                         <?php if ($poll['poll_id'] != 0):?>

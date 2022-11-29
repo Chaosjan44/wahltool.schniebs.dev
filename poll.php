@@ -4,8 +4,7 @@ if (!isset($_GET["uni"])) {
     header("location: index.php");
     exit;
 }
-$error_msg;
-
+$error_msg = "";
 $stmt = $pdo->prepare("SELECT * FROM polls WHERE poll_unique = ?");
 $stmt->bindValue(1, $_GET["uni"]);
 $result = $stmt->execute();
@@ -15,37 +14,37 @@ if (!$result) {
 }
 $poll = $stmt->fetch();
 
-
 if (isset($_POST['action'])) {
+    error_log("4");
     if ($_POST['action'] == 'login') {
+        error_log("4");
         if(isset($_POST['passwort'])) {
-            $passwort = password_hash($_POST['passwort'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("SELECT * FROM poll_users WHERE poll_id = ? AND `password` = ?");
+            $passwort = $_POST['passwort'];
+            $stmt = $pdo->prepare("SELECT * FROM polls_users WHERE poll_id = ? AND `password` = ?");
             $stmt->bindValue(1, $poll['poll_id']);
             $stmt->bindValue(2, $passwort);
             $result = $stmt->execute();
             if (!$result) {
                 $error_msg = "<span class='text-danger'>Passwort ungültig!<br><br></span>";
+            }
+            $poll_user = $stmt->fetch();
+            $_SESSION['userid'] = $poll_user['poll_user_id'];
+            $identifier = md5(uniqid());
+            $securitytoken = md5(uniqid());
             
-                $poll_user = $stmt->fetch();
-                $_SESSION['userid'] = $poll_user['poll_user_id'];
-                $identifier = md5(uniqid());
-                $securitytoken = md5(uniqid());
-                
-                $stmt = $pdo->prepare("INSERT INTO poll_securitytokens (poll_user_id, identifier, securitytoken) VALUES (?, ?, ?)");
-                $stmt->bindValue(1, $poll_user['poll_user_id'], PDO::PARAM_INT);
-                $stmt->bindValue(2, $identifier);
-                $stmt->bindValue(3, sha1($securitytoken));
-                $result = $stmt->execute();
-                if (!$result) {
-                    error_log("Fehler beim Anmelden");
-                    exit;
-                }
-                setcookie("identifier",$identifier,time()+(3600*12)); //Valid for 12 hours
-                setcookie("securitytoken",$securitytoken,time()+(3600*12)); //Valid for 12 hours
-                echo("<script>location.href='poll.php?uni=" . $_GET["uni"] . "'</script>");
+            $stmt = $pdo->prepare("INSERT INTO poll_securitytokens (poll_user_id, identifier, securitytoken) VALUES (?, ?, ?)");
+            $stmt->bindValue(1, $poll_user['poll_user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(2, $identifier);
+            $stmt->bindValue(3, sha1($securitytoken));
+            $result = $stmt->execute();
+            if (!$result) {
+                error_log("Fehler beim Anmelden");
                 exit;
             }
+            setcookie("poll_identifier",$identifier,time()+(3600*12)); //Valid for 12 hours
+            setcookie("poll_securitytoken",$securitytoken,time()+(3600*12)); //Valid for 12 hours
+            echo("<script>location.href='poll.php?uni=" . $_GET["uni"] . "'</script>");
+            exit;
         }
     }
 }
@@ -61,7 +60,7 @@ if ($poll_user == false) {
                         <h3 class="card-title display-3 text-center mb-4 text-kolping-orange">Anmelden</h3>
                         <div class="card-text">
                             <?=$error_msg?>
-                            <form action="login.php" method="post">
+                            <form action="poll.php?uni=<?=$_GET["uni"]?>" method="POST">
                                 <div class="form-floating mb-3">
                                     <input id="inputPassword" type="password" name="passwort" placeholder="Passwort" class="form-control border-0 ps-4 text-dark fw-bold" required>
                                     <label for="inputPassword" class="text-dark fw-bold">Passwort</label>
@@ -79,4 +78,8 @@ if ($poll_user == false) {
         </div>
     </div>
     <?php require_once("templates/footer.php"); 
-}?>
+} else { require_once("templates/header.php"); ?>
+    <div class="container py-3">
+        works
+    </div>
+    <?php require_once("templates/footer.php"); } ?>
