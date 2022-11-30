@@ -230,6 +230,12 @@ if (isset($_POST['action'])) {
         if (!$result) {
             error('Datenbank Fehler!', pdo_debugStrParams($stmt));
         } 
+        $stmt = $pdo->prepare("UPDATE polls_users SET answered_current = 0, refresh = 1, forcerefresh = 1 WHERE poll_id = ?");
+        $stmt->bindValue(1, $_POST['poll_id']);
+        $result = $stmt->execute();
+        if (!$result) {
+            error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+        } 
         print("<script>location.href='poll.php?edit=" . $_POST['poll_id'] . "'</script>");
         exit;
 
@@ -237,6 +243,18 @@ if (isset($_POST['action'])) {
     } else if ($_POST['action'] == 'poll_question_setnotlive') {
         // set selected question of poll to current
         $stmt = $pdo->prepare("UPDATE questions SET current = 0 WHERE question_id = ?");
+        $stmt->bindValue(1, $_POST['question_id']);
+        $result = $stmt->execute();
+        if (!$result) {
+            error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+        } 
+        print("<script>location.href='poll.php?edit=" . $_POST['poll_id'] . "'</script>");
+        exit;
+
+    // action to delete results of question
+    } else if ($_POST['action'] == 'poll_question_delete_results') {
+        // set selected question of poll to current
+        $stmt = $pdo->prepare("UPDATE options SET votes = 0 WHERE question_id = ?");
         $stmt->bindValue(1, $_POST['question_id']);
         $result = $stmt->execute();
         if (!$result) {
@@ -622,10 +640,29 @@ if (isset($_POST['action'])) {
                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
                                 <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
                                 <button class="btn btn-kolping" type="submit" name="action" value="poll_question_add_option">Option Hinzufügen</button>
-                                <button class="btn btn-kolping" type="submit" name="action" value="poll_edit_question">Editieren</button>
+                                <button class="btn btn-kolping" type="submit" name="action" value="poll_edit_question">Frage Editieren</button>
+                                <div>
+                                    <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>l" aria-controls="offcanvas<?=$question['question_id']?>l">Ergebnisse löschen</button>
+                                    <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$question['question_id']?>l" aria-labelledby="offcanvas<?=$question['question_id']?>lLabel">
+                                        <div class="offcanvas-header">
+                                            <h2 class="offcanvas-title ctext" id="offcanvas<?=$question['question_id']?>lLabel">Wirklich Löschen?</h2>
+                                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                        </div>
+                                        <div class="offcanvas-body">
+                                            <span class="my-3 text-center">Bist du dir sicher das du die Ergebnisse löschen möchtest?</span>
+                                            <div class="my-3 d-grid gap-2 d-md-flex justify-content-md-center">
+                                                <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
+                                                <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
+                                                <button class="btn btn-success" type="submit" name="action" value="poll_question_delete_results">Ja</button>
+                                                <button class="btn btn-danger" type="button" data-bs-dismiss="offcanvas" aria-label="Close">Nein</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="">
                                     <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
-                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>" aria-controls="offcanvas<?=$question['question_id']?>">Löschen</button>
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>" aria-controls="offcanvas<?=$question['question_id']?>">Frage Löschen</button>
                                     <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$question['question_id']?>" aria-labelledby="offcanvas<?=$question['question_id']?>Label">
                                         <div class="offcanvas-header">
                                             <h2 class="offcanvas-title ctext" id="offcanvas<?=$question['question_id']?>Label">Wirklich Löschen?</h2>

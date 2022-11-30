@@ -4,11 +4,10 @@ if (!isset($_GET["uni"])) {
     header("location: index.php");
     exit;
 }
-$error_msg = "";
 $stmt = $pdo->prepare("SELECT * FROM polls WHERE poll_unique = ?");
 $stmt->bindValue(1, $_GET["uni"]);
-$result = $stmt->execute();
-if (!$result) {
+$stmt->execute();
+if ($stmt->rowCount() < 1) {
     header("location: index.php");
     exit;
 }
@@ -23,8 +22,8 @@ if (isset($_POST['action'])) {
             $stmt = $pdo->prepare("SELECT * FROM polls_users WHERE poll_id = ? AND `password` = ?");
             $stmt->bindValue(1, $poll['poll_id']);
             $stmt->bindValue(2, $passwort);
-            $result = $stmt->execute();
-            if (!$result) {
+            $stmt->execute();
+            if ($stmt->rowCount() < 1) {
                 $error_msg = "<span class='text-danger'>Passwort ungültig!<br><br></span>";
             }
             $poll_user = $stmt->fetch();
@@ -36,8 +35,8 @@ if (isset($_POST['action'])) {
             $stmt->bindValue(1, $poll_user['poll_user_id'], PDO::PARAM_INT);
             $stmt->bindValue(2, $identifier);
             $stmt->bindValue(3, sha1($securitytoken));
-            $result = $stmt->execute();
-            if (!$result) {
+            $stmt->execute();
+            if ($stmt->rowCount() < 1) {
                 error_log("Fehler beim Anmelden");
                 exit;
             }
@@ -79,7 +78,13 @@ if ($poll_user == false) {
     </div>
     <?php require_once("templates/footer.php"); 
 } else { require_once("templates/header.php"); ?>
+    <script src="js/refresher.js"></script>
     <div class="container py-3">
-        works
+        <h1 class="display-4 text-center text-kolping-orange"><?=$poll["poll_name"]?></h1>
+        <div class="card cbg2">
+            <div class="card-body">
+                <div id="poll_div"></div>
+            </div>
+        </div>
     </div>
     <?php require_once("templates/footer.php"); } ?>

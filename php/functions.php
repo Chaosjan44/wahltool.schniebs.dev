@@ -69,8 +69,8 @@ function check_poll_user() {
 			if (!$result) {
 				exit;
 			}
-			setcookie("poll_identifier",$identifier,time()+(3600*24*90),'/'); //90 Tage Gültigkeit
-			setcookie("poll_securitytoken",$neuer_securitytoken,time()+(3600*24*90),'/'); //90 Tage Gültigkeit
+			setcookie("poll_identifier",$identifier,time()+(3600*12),'/'); // valid for 12 hours
+			setcookie("poll_securitytoken",$neuer_securitytoken,time()+(3600*12),'/'); // valid for 12 hours
 			//Logge den Benutzer ein
 			$_SESSION['userid'] = $securitytoken_row['poll_user_id'];
 		}

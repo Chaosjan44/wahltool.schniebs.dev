@@ -32,6 +32,13 @@ if(isset($_POST['action'])) {
             } else {
                 error('Passwörter stimmen nicht überein!');
             }
+            $stmt = $pdo->prepare('UPDATE users SET sel_group_id = ? WHERE user_id = ?');
+            $stmt->bindValue(1, $_POST['group_sel'], PDO::PARAM_INT);
+            $stmt->bindValue(2, $user["user_id"]);
+            $result = $stmt->execute();
+            if (!$result) {
+                error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+            }
             echo("<script>location.href='/internal.php'</script>");
             exit;
         }
@@ -41,6 +48,13 @@ if(isset($_POST['action'])) {
         exit;
     }
 }
+$stmt = $pdo->prepare('SELECT * FROM users_groups, groups where users_groups.group_id = groups.group_id AND users_groups.user_id  = ?');
+$stmt->bindValue(1, $user["user_id"]);
+$result = $stmt->execute();
+if ($stmt->rowCount() < 1) {
+    error('Du bist in keiner Gruppe, wende dich bitte an die Administrierende Person', pdo_debugStrParams($stmt));
+}
+$groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 require_once("templates/header.php"); 
 ?>
 <div class="px-3 py-3">
@@ -57,6 +71,14 @@ require_once("templates/header.php");
                         <span class="input-group-text" for="inputNachname" style="min-width: 150px;">Nachname</span>
                         <input class="form-control" id="inputNachname" name="nachname" type="text" value="<?=$user['nachname']?>" required>
                     </div>
+                    <div class="input-group py-2">
+                        <span class="input-group-text" for="selectGroup" style="min-width: 150px;">Gruppe</span>
+                        <select class="form-select" aria-label="Default select example" name="group_sel" id="selectGroup">
+                            <?php $i = 0; foreach ($groups as $group): ?>
+                                <option class="text-dark" <?php if($group['group_id'] == $user['sel_group_id']) print("selected");?> value="<?=$group['group_id']?>"><?=$group['group_name']?></option>
+                            <?php $i++; endforeach; ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="<?php if (!isMobile()) print("col-6"); else print("col-12");?>">
                     <div class="input-group py-2">
@@ -65,10 +87,13 @@ require_once("templates/header.php");
                     <div class="input-group py-2">
                         <input class="form-control" id="inputPasswortNeu2" name="passwortNeu2" type="password" placeholder="Neues Passwort wiederholen">
                     </div>
+                    <div class="input-group py-2 justify-content-end">
+                        <button type="submit" name="action" value="save" class="btn btn-success">Speichern</button>
+                        <button type="submit" name="action" value="cancel" class="btn btn-danger">Abrechen</button>
+                    </div>
                 </div>
             </div>
-            <button type="submit" name="action" value="save" class="me-2 btn btn-success my-2">Speichern</button>
-            <button type="submit" name="action" value="cancel" class="ms-2 btn btn-danger my-2">Abrechen</button>
+
         </form>
     </div>
 </div>

@@ -53,6 +53,8 @@ CREATE TABLE `polls_users` (
   `password` varchar(255) NOT NULL,
   `poll_id` int(10) NOT NULL,
   `answered_current` tinyint(1) NOT NULL DEFAULT 0,
+  `refresh` tinyint(1),
+  `forcerefresh` tinyint(1),
   PRIMARY KEY (`poll_user_id`),
   FOREIGN KEY (`poll_id`) REFERENCES `polls` (`poll_id`)
 );

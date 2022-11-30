@@ -118,7 +118,7 @@ if (!isset($user["sel_group_id"])) {
             <form class="d-grid gap-2 col<?php if(!isMobile()) print("-6"); ?> mx-auto" action="group.php" method="post">
                 <select class="form-select" aria-label="Default select example" name="group_sel">
                     <?php $i = 0; foreach ($groups as $group): ?>
-                        <option <?php ($i = 0 ? "selected" : "")?> value="<?=$group['group_id']?>"><?=$group['group_name']?></option>
+                        <option class="text-dark" <?php ($i = 0 ? "selected" : "")?> value="<?=$group['group_id']?>"><?=$group['group_name']?></option>
                     <?php $i++; endforeach; ?>
                 </select>
                 <button type="submit" name="action" value="sel_group" class="btn btn-kolping mx-auto">Wählen</button>
