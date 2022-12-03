@@ -369,9 +369,15 @@ if (isset($_POST['action'])) {
 
     // action to save poll users
     } else if ($_POST['action'] == 'poll_users_save') { 
+        $passwords = array("0", "1");
         for ($i = 0; $i < $_POST['poll_user_amount']; $i++) {
+            $password = generateRandomString(6);
+            while (in_array($password, $passwords)) {
+                $password = generateRandomString(6);
+            }
+            array_push($passwords, $password);
             $stmt = $pdo->prepare("INSERT INTO polls_users SET password = ?, poll_id = ?");
-            $stmt->bindValue(1, generateRandomString(6));
+            $stmt->bindValue(1, $password);
             $stmt->bindValue(2, $_POST['poll_id']);
             $result = $stmt->execute();
             if (!$result) {
@@ -556,6 +562,14 @@ if (isset($_POST['action'])) {
                     } else {
                         $options = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     }
+                    $stmt = $pdo->prepare('SELECT count(poll_user_id) as counter FROM polls_users where answered_current = 1 and poll_id = ?');
+                    $stmt->bindValue(1, $question["poll_id"], PDO::PARAM_INT);
+                    $stmt->execute();
+                    if ($stmt->rowCount() < 1) {
+                        $vote_count['counter'] = "0";
+                    } else {
+                        $vote_count = $stmt->fetch();
+                    }
                 ?>
                     <div class="card cbg2 my-3 p-1">
                         <div class="card-body row">
@@ -575,7 +589,10 @@ if (isset($_POST['action'])) {
                                     <button class="btn btn-secondary" type="submit" name="action" value="poll_question_setnotlive">Inaktiv setzten</button>
                                 </form>
                             </div>
-                            <h3 class="card-title text-start mb-0 mt-1">Optionen zur Auswahl: <?=$question['options_amount']?></h3>
+                            <div class="col justify-content-between d-flex">
+                                <h3 class="card-title text-start mb-0 mt-1">Optionen zur Auswahl: <?=$question['options_amount']?></h3>
+                                <h3 class="card-title text-end mb-0 mt-1">Personen die abgestimmt haben: <?=$vote_count['counter']?></h3>
+                            </div>
                             <p class="card-text">
                                 <?=$error_msg2?>
                                 <?php if ($error_msg2 == ""): ?>

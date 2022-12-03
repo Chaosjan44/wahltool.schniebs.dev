@@ -48,6 +48,19 @@ function getCookie(cname) {
   return "";
 }
 
+function updatecur () {
+  var inputElems = document.getElementsByTagName("input"),
+  count = -1;
+  for (var i=0; i<inputElems.length; i++) {
+    if (inputElems[i].type === "checkbox" && inputElems[i].checked === true){
+        count++;
+        document.getElementById('cur_checked').innerHTML = count;
+    }
+  }
+}
+
+
+
 // function showPreview(event){
 // 	var files = event.target.files;
 // 	var preview = document.getElementById('preview');

@@ -14,6 +14,9 @@ function check_user() {
 		}
 		$securitytoken_row = $stmt->fetch();
 		if(sha1($securitytoken) !== $securitytoken_row['securitytoken']) {
+			setcookie("identifier","del",time()-(3600*12),'/'); // valid for -12 hours
+			setcookie("securitytoken","del",time()-(3600*12),'/'); // valid for -12 hours
+			header("Refresh:0");
 			exit;
 		} else { //Token war korrekt
 			//Setze neuen Token
@@ -53,7 +56,10 @@ function check_poll_user() {
 		$stmt = $pdo->prepare("SELECT * FROM poll_securitytokens WHERE identifier = ?");
 		$stmt->bindValue(1, $identifier);
 		$result = $stmt->execute();
-		if (!$result) {
+		if ($stmt->rowCount() < 1) {
+			setcookie("poll_identifier","del",time()-(3600*12),'/'); // valid for -12 hours
+			setcookie("poll_securitytoken","del",time()-(3600*12),'/'); // valid for -12 hours
+			header("Refresh:0");
 			exit;
 		}
 		$securitytoken_row = $stmt->fetch();

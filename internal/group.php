@@ -45,9 +45,9 @@ if(isset($_POST['action'])) {
 
             // delete all options for all questions
             foreach ($questions as $question) {
-                $stmt = $pdo->prepare('DELETE FROM options WHERE option_id = ?');
+                $stmt = $pdo->prepare('DELETE FROM options WHERE question_id = ?');
                 $stmt->bindValue(1, $question['question_id']);
-                $result = $stmt->execute();
+                $stmt->execute();
                 if (!$result) {
                     error('Datenbank Fehler #3 beim löschen der Wahl!', pdo_debugStrParams($stmt));
                 }
@@ -60,7 +60,6 @@ if(isset($_POST['action'])) {
             if (!$result) {
                 error('Datenbank Fehler #4 beim löschen der Wahl!', pdo_debugStrParams($stmt));
             }
-
             // select all users for poll
             $stmt = $pdo->prepare('SELECT poll_user_id FROM polls_users where poll_id = ?');
             $stmt->bindValue(1, $_POST['poll_id']);
