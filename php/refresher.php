@@ -2,6 +2,11 @@
 chdir ($_SERVER['DOCUMENT_ROOT']);
 require_once("php/functions.php");
 $poll_user = check_poll_user();
+if ($poll_user == false) {
+    print('<h1 class="text-center text-danger display-5">Seite neu laden!</h1>');
+    print('<div style="display: none">unstop</div>');
+    exit;
+}
 
 $errormsg = "";
 if (isset($_POST['action'])) {
@@ -123,7 +128,7 @@ if ($poll_user['refresh'] == 1) {
             }
             $poll = $stmt->fetch();
             echo($errormsg);
-            echo('<form action="/php/refresher.php" method="POST"><div class="card-title row"><h2 class="col-8 text-kolping-orange text-start">' . $question["question"] . '</h2><h class="col-4 ctext text-end">Stimmen: <span id="cur_checked">0</span> / ' . $question["options_amount"] . '</h2></div>');
+            echo('<form action="/php/refresher.php" method="POST"><div class="card-title row"><h2 class="col-8 text-kolping-orange text-start">' . $question["question"] . '</h2><h class="col-4 ctext text-end"><span id="cur_checked">0</span> / ' . $question["options_amount"] . '</h2></div>');
             echo($poll_user['error_msg']);
             foreach ($options as $option) {
             print('<div class="input-group justify-content-center my-2"><label for="'. $option["option_id"] . '" class="input-group-text">' . $option["option_name"] . '</label><div class="input-group-text"><input type="number" value="' . $option["option_id"] . '" name="option_' . $option["option_id"] . '" style="display: none;" required><input id="' . $option["option_id"] . '" type="checkbox" name="vote_' . $option["option_id"] . '" value="0" class="form-check-input checkbox-kolping mt-0" onchange="updatecur()"></div></div>');

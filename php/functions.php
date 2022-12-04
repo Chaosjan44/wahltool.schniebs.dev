@@ -59,7 +59,9 @@ function check_poll_user() {
 		if ($stmt->rowCount() < 1) {
 			setcookie("poll_identifier","del",time()-(3600*12),'/'); // valid for -12 hours
 			setcookie("poll_securitytoken","del",time()-(3600*12),'/'); // valid for -12 hours
+			error_log("usererrorthingy");
 			header("Refresh:0");
+			return FALSE;
 			exit;
 		}
 		$securitytoken_row = $stmt->fetch();

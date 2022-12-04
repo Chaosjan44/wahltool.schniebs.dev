@@ -32,6 +32,6 @@ function refresh() {
             str = "";
         }
     }
-    xhttp.open("GET", "/php/refresher.php"+str);
+    xhttp.open("GET", "/php/refresher.php");
     xhttp.send();
 }

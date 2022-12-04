@@ -303,8 +303,14 @@ if (isset($_POST['action'])) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php foreach ($options as $option): 
-                                    $width = ($option['votes'] / $vote_count['counter']) * 100;
+                                <?php 
+                                    $counter;
+                                    foreach ($options as $option) {
+                                        $counter += $option['votes'];
+                                    }
+                                    foreach ($options as $option): 
+                                        
+                                        $width = ($option['votes'] / $counter) * 100;
                                 ?>
                                     <tr>
                                         <td>
@@ -312,7 +318,7 @@ if (isset($_POST['action'])) {
                                         </td>
                                         <td>
                                             <div class="progress" style="height: 3vh;">
-                                                <div class="progress-bar kolping-orange" role="progressbar" aria-label="" style="width: <?=$width?>%;" aria-valuenow="<?=$option['votes']?>" aria-valuemin="0" aria-valuemax="<?=$vote_count['counter']?>"><?=$width?>%</div>
+                                                <div class="progress-bar kolping-orange" role="progressbar" aria-label="" style="width: <?=$width?>%;" aria-valuenow="<?=$option['votes']?>" aria-valuemin="0" aria-valuemax="<?=$vote_count['counter']?>"><?=$option['votes']?></div>
                                             </div>
                                         </td>
                                     </tr>

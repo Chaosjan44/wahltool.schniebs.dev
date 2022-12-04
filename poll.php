@@ -50,6 +50,7 @@ if (isset($_POST['action'])) {
 
 $poll_user = check_poll_user();
 if ($poll_user == false) {
+    $error_msg = "";
     require_once("templates/header.php"); ?>
     <div class="container py-3">
         <div class="row justify-content-center">
@@ -93,10 +94,12 @@ if ($poll_user == false) {
     ?>
         <script src="js/refresher.js"></script>
         <div class="container py-3">
-            <div class="d-grid gap-2 d-md-flex justify-align-content-md-around">
-                <h1 class="display-4 text-center text-kolping-orange col"><?=$poll["poll_name"]?></h1>
-                <div>
-                    <button class="btn btn-kolping my-2" type="button" onclick="window.location.href = '/poll_logout.php';"><i class="bi bi-door-closed-fill"></i></button>
+            <div class="row">
+                <h1 class="display-4 text-start text-kolping-orange col-8"><?=$poll["poll_name"]?></h1>
+                <div class="col-4 d-grid d-md-flex justify-content-end">
+                    <div>
+                        <button class="btn btn-kolping my-2" type="button" onclick="window.location.href = '/poll_logout.php';"><i class="bi bi-door-closed-fill"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="card cbg2">
