@@ -78,14 +78,14 @@ if (isset($_POST['action'])) {
                     <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                         <div class="col-8">
                             <div class="form-floating">
-                                <input id="inputName" type="text" name="poll_name" placeholder="Wahl Name" value="<?=$poll['poll_name']?>" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                                <input id="inputName" type="text" name="poll_name" placeholder="Wahl Name" value="<?=$poll['poll_name']?>" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                                 <label for="inputName" class="text-dark fw-bold">Wahl Name</label>
                             </div>
                         </div>
                         <div class="col-4 d-grid gap-2 d-md-flex justify-content-md-end">
                             <input type="number" value="<?=$_POST['poll_id']?>" name="poll_id" style="display: none;" required>
-                            <button type="submit" name="action" value="poll_save" class="btn btn-success">Wahl speichern</button>
-                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'>Abbrechen</button>
+                            <button type="submit" name="action" value="poll_save" class="btn btn-success"><i class="bi bi-download"></i></button>
+                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'><i class="bi bi-arrow-left"></i></button>
                         </div>
                     </form>
                 </div>
@@ -132,7 +132,7 @@ if (isset($_POST['action'])) {
                     <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                         <div class="col-8">
                             <div class="form-floating my-2">
-                                <input id="inputName" type="text" name="question" placeholder="Frage" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                                <input id="inputName" type="text" name="question" placeholder="Frage" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                                 <label for="inputName" class="text-dark fw-bold">Frage</label>
                             </div>
                             <div class="form-floating my-2">
@@ -142,8 +142,8 @@ if (isset($_POST['action'])) {
                         </div>
                         <div class="col-4 d-grid gap-2 d-md-flex justify-content-md-end">
                             <input type="number" value="<?=$_POST['poll_id']?>" name="poll_id" style="display: none;" required>
-                            <button type="submit" name="action" value="poll_save_question" class="btn btn-success">Frage hinzufügen</button>
-                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'>Abbrechen</button>
+                            <button type="submit" name="action" value="poll_save_question" class="btn btn-success"><i class="bi bi-plus-square-fill"></i></button>
+                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'><i class="bi bi-arrow-left"></i></button>
                         </div>
                     </form>
                 </div>
@@ -193,7 +193,7 @@ if (isset($_POST['action'])) {
                     <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                         <div class="col-8">
                             <div class="form-floating my-2">
-                                <input id="inputName" type="text" name="question" placeholder="Frage" value="<?=$question['question']?>" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                                <input id="inputName" type="text" name="question" placeholder="Frage" value="<?=$question['question']?>" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                                 <label for="inputName" class="text-dark fw-bold">Frage</label>
                             </div>
                             <div class="form-floating my-2">
@@ -204,8 +204,8 @@ if (isset($_POST['action'])) {
                         <div class="col-4 d-grid gap-2 d-md-flex justify-content-md-end">
                             <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
                             <input type="number" value="<?=$_POST['poll_id']?>" name="poll_id" style="display: none;" required>
-                            <button type="submit" name="action" value="poll_save_question" class="btn btn-success">Frage speichern</button>
-                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'>Abbrechen</button>
+                            <button type="submit" name="action" value="poll_save_question" class="btn btn-success"><i class="bi bi-download"></i></button>
+                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'><i class="bi bi-arrow-left"></i></button>
                         </div>
                     </form>
                 </div>
@@ -251,7 +251,87 @@ if (isset($_POST['action'])) {
         print("<script>location.href='poll.php?edit=" . $_POST['poll_id'] . "'</script>");
         exit;
 
-    // action to delete results of question
+    // action to show results of question
+    } else if ($_POST['action'] == 'poll_question_show_result') {
+        $stmt = $pdo->prepare("SELECT * FROM options  WHERE question_id = ?");
+        $stmt->bindValue(1, $_POST['question_id']);
+        $stmt->execute();
+        if ($stmt->rowCount() < 1) {
+            error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+        } 
+        $options = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare("SELECT * FROM questions  WHERE question_id = ?");
+        $stmt->bindValue(1, $_POST['question_id']);
+        $stmt->execute();
+        if ($stmt->rowCount() < 1) {
+            error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+        } 
+        $question = $stmt->fetch();
+
+        $stmt = $pdo->prepare('SELECT count(poll_user_id) as counter FROM polls_users where answered_current = 1 and poll_id = ?');
+        $stmt->bindValue(1, $_POST['poll_id']);
+        $stmt->execute();
+        if ($stmt->rowCount() < 1) {
+            $vote_count['counter'] = "0";
+        } else {
+            $vote_count = $stmt->fetch();
+        }
+
+        $stmt = $pdo->prepare('SELECT * FROM polls where poll_id = ?');
+        $stmt->bindValue(1, $_POST['poll_id']);
+        $result2 = $stmt->execute();
+        if (!$result2) {
+            error('Fehler', pdo_debugStrParams($stmt));
+        }
+        $poll = $stmt->fetch();
+        require("templates/header.php");
+        $poll_id = $poll['poll_id'];
+        ?>
+        <div class="container p-3">
+            <h1 class="text-kolping-orange text-center display-4"><?=$poll['poll_name']?></h1>
+            <h1 class="text-kolping-orange text-center display-5"><?=$question['question']?></h1>
+            <div class="">
+                <div class="card cbg2">
+                    <div class="card-body cbg2">
+                        <div class="">
+                            <table class="table align-middle table-borderless table-hover">                        
+                                <thead>
+                                    <tr class="cbg2">
+                                        <th scope="col cbg2" style="width: 20%;"></th>
+                                        <th scope="col cbg2" style="width: 80%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <?php foreach ($options as $option): 
+                                    $width = ($option['votes'] / $vote_count['counter']) * 100;
+                                ?>
+                                    <tr>
+                                        <td>
+                                            <h5 class="ctext text-center"><?=$option['option_name']?> </h5>
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 3vh;">
+                                                <div class="progress-bar kolping-orange" role="progressbar" aria-label="" style="width: <?=$width?>%;" aria-valuenow="<?=$option['votes']?>" aria-valuemin="0" aria-valuemax="<?=$vote_count['counter']?>"><?=$width?>%</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center p-3">
+                <button class="btn btn-kolping" type="button" onclick="window.location.href = 'poll.php?edit=<?=$poll_id?>';"><i class="bi bi-arrow-left"></i></button>
+            </div>
+        </div>
+        <?php
+        require("templates/footer.php");
+        exit;
+
+    // action to save an option of a question
     } else if ($_POST['action'] == 'poll_question_delete_results') {
         // set selected question of poll to current
         $stmt = $pdo->prepare("UPDATE options SET votes = 0 WHERE question_id = ?");
@@ -299,15 +379,15 @@ if (isset($_POST['action'])) {
                     <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                         <div class="col-8">
                             <div class="form-floating">
-                                <input id="inputName" type="text" name="option_name" placeholder="Name der Option" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                                <input id="inputName" type="text" name="option_name" placeholder="Name der Option" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                                 <label for="inputName" class="text-dark fw-bold">Name der Option</label>
                             </div>
                         </div>
                         <div class="col-4 d-grid gap-2 d-md-flex justify-content-md-end">
                             <input type="number" value="<?=$_POST['question_id']?>" name="question_id" style="display: none;" required>
                             <input type="number" value="<?=$_POST['poll_id']?>" name="poll_id" style="display: none;" required>
-                            <button type="submit" name="action" value="poll_question_save_option" class="btn btn-success">Option hinzufügen</button>
-                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'>Abbrechen</button>
+                            <button type="submit" name="action" value="poll_question_save_option" class="btn btn-success"><i class="bi bi-plus-square-fill"></i></button>
+                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'><i class="bi bi-arrow-left"></i></button>
                         </div>
                     </form>
                 </div>
@@ -350,15 +430,15 @@ if (isset($_POST['action'])) {
                     <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                         <div class="col-8">
                             <div class="form-floating">
-                                <input id="inputName" type="text" name="option_name" placeholder="Name der Option" value="<?=$option['option_name']?>" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                                <input id="inputName" type="text" name="option_name" placeholder="Name der Option" value="<?=$option['option_name']?>" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                                 <label for="inputName" class="text-dark fw-bold">Name der Option</label>
                             </div>
                         </div>
                         <div class="col-4 d-grid gap-2 d-md-flex justify-content-md-end">
                             <input type="number" value="<?=$option['option_id']?>" name="option_id" style="display: none;" required>
                             <input type="number" value="<?=$_POST['poll_id']?>" name="poll_id" style="display: none;" required>
-                            <button type="submit" name="action" value="poll_question_save_option" class="btn btn-success">Option speichern</button>
-                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'>Abbrechen</button>
+                            <button type="submit" name="action" value="poll_question_save_option" class="btn btn-success"><i class="bi bi-download"></i></button>
+                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'><i class="bi bi-arrow-left"></i></button>
                         </div>
                     </form>
                 </div>
@@ -401,14 +481,14 @@ if (isset($_POST['action'])) {
                     <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                         <div class="col-8">
                             <div class="form-floating">
-                                <input id="inputName" type="number" name="poll_user_amount" placeholder="Anzahl an Nutzer*innen" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                                <input id="inputName" type="number" name="poll_user_amount" placeholder="Anzahl an Nutzer*innen" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                                 <label for="inputName" class="text-dark fw-bold">Anzahl an Nutzer*innen</label>
                             </div>
                         </div>
                         <div class="col-4 d-grid gap-2 d-md-flex justify-content-md-end">
                             <input type="number" value="<?=$_POST['poll_id']?>" name="poll_id" style="display: none;" required>
-                            <button type="submit" name="action" value="poll_users_save" class="btn btn-success">Nutzer*innen erstellen</button>
-                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'>Abbrechen</button>
+                            <button type="submit" name="action" value="poll_users_save" class="btn btn-success"><i class="bi bi-plus-square-fill"></i></button>
+                            <button class="btn btn-danger" type="button" onclick='window.location.href = "poll.php?edit=<?=$pollid?>";'><i class="bi bi-arrow-left"></i></button>
                         </div>
                     </form>
                 </div>
@@ -488,13 +568,13 @@ if (isset($_POST['action'])) {
                 <form action="poll.php" method="post" class="<?php if (!isMobile()) print('row');?> align-items-center">
                     <div class="col-10">
                         <div class="form-floating">
-                            <input id="inputName" type="text" name="poll_name" placeholder="Name der Wahl" class="form-control border-0 ps-4 text-dark fw-bold" required>
+                            <input id="inputName" type="text" name="poll_name" placeholder="Name der Wahl" class="form-control border-0 ps-4 text-dark fw-bold" required autofocus>
                             <label for="inputName" class="text-dark fw-bold">Name der Wahl</label>
                         </div>
                     </div>
                     <div class="col-2">
                         <input type="number" value="<?=$group['group_id']?>" name="group_id" style="display: none;" required>
-                        <button type="submit" name="action" value="create_poll" class="btn btn-success">Wahl erstellen</button>
+                        <button type="submit" name="action" value="create_poll" class="btn btn-success"><i class="bi bi-plus-square-fill"></i></button>
                     </div>
                 </form>
             </div>
@@ -543,9 +623,9 @@ if (isset($_POST['action'])) {
                 <div class="col-4">
                     <form action="poll.php" method="POST" class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                        <button class="btn btn-kolping" type="submit" name="action" value="poll_edit">Wahl anpassen</button>
-                        <button class="btn btn-kolping" type="submit" name="action" value="poll_add_question">Frage Hinzufügen</button>
-                        <button class="btn btn-danger" type="button" onclick="window.location.href = 'group.php';">Abbrechen</button>
+                        <button class="btn btn-kolping" type="submit" name="action" value="poll_edit"><i class="bi bi-pencil-fill"></i></button>
+                        <button class="btn btn-kolping" type="submit" name="action" value="poll_add_question"><i class="bi bi-plus-square-fill"></i></button>
+                        <button class="btn btn-danger" type="button" onclick="window.location.href = 'group.php';"><i class="bi bi-arrow-left"></i></button>
                     </form>
                 </div>
                 
@@ -581,7 +661,7 @@ if (isset($_POST['action'])) {
                                     <h3 class="card-title text-start mb-0 ms-1"><?=$question['question']?></h3>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-4 pe-2">
                                 <form action="poll.php" method="POST" class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
                                     <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
@@ -626,11 +706,11 @@ if (isset($_POST['action'])) {
                                                         <div class="">
                                                             <input type="number" value="<?=$option['option_id']?>" name="option_id" style="display: none;" required>
                                                             <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                                                            <button type="submit" name="action" value="poll_question_edit_option" class="btn btn-kolping">Editieren</button>
+                                                            <button type="submit" name="action" value="poll_question_edit_option" class="btn btn-kolping"><i class="bi bi-pencil-fill"></i></button>
                                                         </div>
                                                         <div class="">
                                                             <input type="number" value="<?=$option['option_id']?>" name="option_id" style="display: none;" required>
-                                                            <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$option['option_id']?>" aria-controls="offcanvas<?=$option['option_id']?>">Löschen</button>
+                                                            <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$option['option_id']?>" aria-controls="offcanvas<?=$option['option_id']?>"><i class="bi bi-trash-fill"></i></button>
                                                             <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$option['option_id']?>" aria-labelledby="offcanvas<?=$option['option_id']?>Label">
                                                                 <div class="offcanvas-header">
                                                                     <h2 class="offcanvas-title ctext" id="offcanvas<?=$option['option_id']?>Label">Wirklich Löschen?</h2>
@@ -653,14 +733,15 @@ if (isset($_POST['action'])) {
                                 </table>
                                 <?php endif;?>
                             </p>
-                            <form action="poll.php" method="POST" class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <form action="poll.php" method="POST" class="d-grid gap-2 d-md-flex justify-content-md-end pe-2">
                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
                                 <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
-                                <button class="btn btn-kolping" type="submit" name="action" value="poll_question_add_option">Option Hinzufügen</button>
-                                <button class="btn btn-kolping" type="submit" name="action" value="poll_edit_question">Frage Editieren</button>
+                                <button class="btn btn-kolping" type="submit" name="action" value="poll_question_show_result"><i class="bi bi-bar-chart-line-fill"></i></button>
+                                <button class="btn btn-kolping" type="submit" name="action" value="poll_question_add_option"><i class="bi bi-plus-square-fill"></i></button>
+                                <button class="btn btn-kolping" type="submit" name="action" value="poll_edit_question"><i class="bi bi-pencil-fill"></i></button>
                                 <div>
                                     <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
-                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>l" aria-controls="offcanvas<?=$question['question_id']?>l">Ergebnisse löschen</button>
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>l" aria-controls="offcanvas<?=$question['question_id']?>l">Ergebnisse zurücksetzten</button>
                                     <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$question['question_id']?>l" aria-labelledby="offcanvas<?=$question['question_id']?>lLabel">
                                         <div class="offcanvas-header">
                                             <h2 class="offcanvas-title ctext" id="offcanvas<?=$question['question_id']?>lLabel">Wirklich Löschen?</h2>
@@ -679,7 +760,7 @@ if (isset($_POST['action'])) {
                                 </div>
                                 <div class="">
                                     <input type="number" value="<?=$question['question_id']?>" name="question_id" style="display: none;" required>
-                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>" aria-controls="offcanvas<?=$question['question_id']?>">Frage Löschen</button>
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$question['question_id']?>" aria-controls="offcanvas<?=$question['question_id']?>"><i class="bi bi-trash-fill"></i></button>
                                     <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$question['question_id']?>" aria-labelledby="offcanvas<?=$question['question_id']?>Label">
                                         <div class="offcanvas-header">
                                             <h2 class="offcanvas-title ctext" id="offcanvas<?=$question['question_id']?>Label">Wirklich Löschen?</h2>
@@ -703,7 +784,7 @@ if (isset($_POST['action'])) {
             </div>
             <!-- Users for poll -->
             <div>
-                <div class="card cbg2 my-3 p-1">
+                <div class="card cbg2 my-3 pt-1">
                     <div class="card-body row">
                         <div class="col-6">
                             <h3 class="text-start mb-0 ms-1">Nutzer*innen für die Wahl</h3>
@@ -712,19 +793,19 @@ if (isset($_POST['action'])) {
                             <form action="poll.php" method="POST" class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <div>
                                     <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                                    <button class="btn btn-success" type="submit" name="action" value="poll_users_create">Nutzer*innen erstellen</button>
+                                    <button class="btn btn-success" type="submit" name="action" value="poll_users_create"><i class="bi bi-plus-square-fill"></i></button>
                                 </div>
                                 <?php if ($error_msg3 == ""): ?>
                                 <div class="">
                                     <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$poll['poll_id']?>1" aria-controls="offcanvas<?=$poll['poll_id']?>1">Alle Nutzer*innen löschen</button>
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$poll['poll_id']?>1" aria-controls="offcanvas<?=$poll['poll_id']?>1"><i class="bi bi-trash-fill"></i></button>
                                     <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$poll['poll_id']?>1" aria-labelledby="offcanvas<?=$poll['poll_id']?>1Label">
                                         <div class="offcanvas-header">
                                             <h2 class="offcanvas-title ctext" id="offcanvas<?=$poll['poll_id']?>1Label">Wirklich Löschen?</h2>
                                             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                                         </div>
                                         <div class="offcanvas-body">
-                                            <span class="pb-3">Bist du dir sicher das du diese Wahl löschen möchtest?<br></span>
+                                            <span class="pb-3">Bist du dir sicher das du alle Nutzer*innen löschen möchtest?<br></span>
                                             <div class="my-3 d-grid gap-2 d-md-flex justify-content-md-center">
                                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
                                                 <button class="btn btn-success" type="submit" name="action" value="poll_users_deleteall">Ja</button>
@@ -782,20 +863,25 @@ if (isset($_POST['action'])) {
                                                 </div>
                                             </td>
                                             <td class="border-0 text-center">
-                                                <div><?=$polls_user['answered_current']?></div>
+                                                <div>
+                                                    <?php 
+                                                        if ($polls_user['answered_current'] == 1) print("Ja");
+                                                        else print("Nein");
+                                                    ?>
+                                                </div>
                                             </td>
-                                            <td class="border-0 actions text-center">
+                                            <td class="border-0 actions text-center pe-0">
                                                 <form action="poll.php" method="post" class="d-grid gap-2 d-md-flex justify-content-md-end">
                                                     <div class="">
                                                         <input type="number" value="<?=$polls_user['poll_user_id']?>" name="poll_user_id" style="display: none;" required>
-                                                        <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$polls_user['poll_user_id']?>" aria-controls="offcanvas<?=$polls_user['poll_user_id']?>">Löschen</button>
+                                                        <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$polls_user['poll_user_id']?>" aria-controls="offcanvas<?=$polls_user['poll_user_id']?>"><i class="bi bi-trash-fill"></i></button>
                                                         <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$polls_user['poll_user_id']?>" aria-labelledby="offcanvas<?=$polls_user['poll_user_id']?>Label">
                                                             <div class="offcanvas-header">
                                                                 <h2 class="offcanvas-title ctext" id="offcanvas<?=$polls_user['poll_user_id']?>Label">Wirklich Löschen?</h2>
                                                                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                                                             </div>
                                                             <div class="offcanvas-body">
-                                                                <span class="pb-3">Bist du dir sicher das du diese Wahl löschen möchtest?<br></span>
+                                                                <span class="pb-3">Bist du dir sicher das du diese*n Nutzer*in löschen möchtest?<br></span>
                                                                 <div class="my-3 d-grid gap-2 d-md-flex justify-content-md-center">
                                                                     <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
                                                                     <input type="number" value="<?=$polls_user['poll_user_id']?>" name="poll_user_id" style="display: none;" required>

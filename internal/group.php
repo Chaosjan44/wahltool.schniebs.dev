@@ -55,7 +55,7 @@ if(isset($_POST['action'])) {
             });
             </script>
             <div class="d-grid gap-2 d-md-flex justify-content-md-center p-3">
-                <button class="btn btn-danger" type="button" onclick="window.location.href = 'group.php';">Zurück</button>
+                <button class="btn btn-danger" type="button" onclick="window.location.href = 'group.php';"><i class="bi bi-arrow-left"></i></button>
             </div>
         </div>
         <?php
@@ -211,7 +211,7 @@ require("templates/header.php");
                     </div>
                     <div class="col-4 d-flex justify-content-end">
                         <div>
-                            <button class="btn btn-kolping mx-1 mx-auto" type="button" onclick="window.location.href = 'poll.php?create';">Wahl erstellen</button>
+                            <button class="btn btn-kolping mx-1 mx-auto" type="button" onclick="window.location.href = 'poll.php?create';"><i class="bi bi-plus-square-fill"></i></button>
                         </div>
                     </div>
                 </div>
@@ -256,15 +256,15 @@ require("templates/header.php");
                                         <form action="group.php" method="post" class="d-grid gap-2 d-md-flex justify-content-md-end">
                                             <div>
                                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                                                <button type="submit" name="action" value="qrcode" class="btn btn-kolping">QRCode</button>
+                                                <button type="submit" name="action" value="qrcode" class="btn btn-kolping"><i class="bi bi-qr-code-scan"></i></button>
                                             </div>
                                             <div class="">
                                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                                                <button type="submit" name="action" value="mod" class="btn btn-kolping">Editieren</button>
+                                                <button type="submit" name="action" value="mod" class="btn btn-kolping"><i class="bi bi-pencil-fill"></i></button>
                                             </div>
                                             <div class="">
                                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
-                                                <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$poll['poll_id']?>" aria-controls="offcanvas<?=$poll['poll_id']?>">Löschen</button>
+                                                <button class="btn btn-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas<?=$poll['poll_id']?>" aria-controls="offcanvas<?=$poll['poll_id']?>"><i class="bi bi-trash-fill"></i></button>
                                                 <div class="offcanvas offcanvas-end cbg" data-bs-scroll="true" tabindex="-1" id="offcanvas<?=$poll['poll_id']?>" aria-labelledby="offcanvas<?=$poll['poll_id']?>Label">
                                                     <div class="offcanvas-header">
                                                         <h2 class="offcanvas-title ctext" id="offcanvas<?=$poll['poll_id']?>Label">Wirklich Löschen?</h2>

@@ -14,9 +14,7 @@ if ($stmt->rowCount() < 1) {
 $poll = $stmt->fetch();
 
 if (isset($_POST['action'])) {
-    error_log("4");
     if ($_POST['action'] == 'login') {
-        error_log("4");
         if(isset($_POST['passwort'])) {
             $passwort = $_POST['passwort'];
             $stmt = $pdo->prepare("SELECT * FROM polls_users WHERE poll_id = ? AND `password` = ?");
@@ -25,6 +23,8 @@ if (isset($_POST['action'])) {
             $stmt->execute();
             if ($stmt->rowCount() < 1) {
                 $error_msg = "<span class='text-danger'>Passwort ungültig!<br><br></span>";
+                echo("<script>location.href='poll.php?uni=" . $_GET["uni"] . "'</script>");
+                exit;
             }
             $poll_user = $stmt->fetch();
             $_SESSION['userid'] = $poll_user['poll_user_id'];
@@ -77,14 +77,32 @@ if ($poll_user == false) {
         </div>
     </div>
     <?php require_once("templates/footer.php"); 
-} else { require_once("templates/header.php"); ?>
-    <script src="js/refresher.js"></script>
-    <div class="container py-3">
-        <h1 class="display-4 text-center text-kolping-orange"><?=$poll["poll_name"]?></h1>
-        <div class="card cbg2">
-            <div class="card-body">
-                <div id="poll_div"></div>
+} else { require_once("templates/header.php"); 
+    if ($poll['poll_id'] != $poll_user['poll_id']) {
+        $identifier = $_COOKIE['poll_identifier'];
+        $stmt = $pdo->prepare("DELETE FROM poll_securitytokens WHERE identifier = ?");
+        $stmt->bindValue(1, $identifier);
+        $delresult = $stmt->execute();
+        if (!$delresult) {
+            error('Fehler!');
+        }
+        setcookie("poll_identifier","del",time()-(3600*12),'/'); // valid for -12 hours
+        setcookie("poll_securitytoken","del",time()-(3600*12),'/'); // valid for -12 hours
+        echo("<script>location.href='poll.php?uni=" . $_GET["uni"] . "'</script>");
+    }
+    ?>
+        <script src="js/refresher.js"></script>
+        <div class="container py-3">
+            <div class="d-grid gap-2 d-md-flex justify-align-content-md-around">
+                <h1 class="display-4 text-center text-kolping-orange col"><?=$poll["poll_name"]?></h1>
+                <div>
+                    <button class="btn btn-kolping my-2" type="button" onclick="window.location.href = '/poll_logout.php';"><i class="bi bi-door-closed-fill"></i></button>
+                </div>
+            </div>
+            <div class="card cbg2">
+                <div class="card-body">
+                    <div id="poll_div"></div>
+                </div>
             </div>
         </div>
-    </div>
     <?php require_once("templates/footer.php"); } ?>
