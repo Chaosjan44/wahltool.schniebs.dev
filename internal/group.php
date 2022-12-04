@@ -22,6 +22,47 @@ if(isset($_POST['action'])) {
         $pollid = $_POST['poll_id'];
         print("<script>location.href='poll.php?edit=" . $pollid . "'</script>");
         exit;
+    } if ($_POST['action'] == 'qrcode') {
+        $stmt = $pdo->prepare('SELECT * FROM polls where poll_id = ?');
+        $stmt->bindValue(1, $_POST['poll_id']);
+        $result = $stmt->execute();
+        if (!$result) {
+        }
+        $poll = $stmt->fetch();
+        require("templates/header.php");
+        ?>
+        <script src="/js/qrcode.js"></script>
+        <div class="container p-3">
+            <h1 class="text-kolping-orange text-center display-1"><?=$poll['poll_name']?></h1>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center pb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="qrcode"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <h1 class="text-center">https://wahltool.schniebs.dev/poll.php?uni=<?=$poll['poll_unique']?></h1>
+            </div>
+            <script type="text/javascript">
+            var qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: "https://wahltool.schniebs.dev/poll.php?uni=<?=$poll['poll_unique']?>",
+                width: 512,
+                height: 512,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            </script>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center p-3">
+                <button class="btn btn-danger" type="button" onclick="window.location.href = 'group.php';">Zurück</button>
+            </div>
+        </div>
+        <?php
+        require("templates/footer.php");
+        exit;
+
+        
     } if ($_POST['action'] == 'deleteconfirm') {
         $stmt = $pdo->prepare('SELECT * FROM users_groups, groups where users_groups.group_id = groups.group_id AND users_groups.group_id = ?');
         $stmt->bindValue(1, $user["sel_group_id"]);
@@ -213,6 +254,10 @@ require("templates/header.php");
                                     <td class="border-0 actions text-center">
                                         <?php if ($poll['poll_id'] != 0):?>
                                         <form action="group.php" method="post" class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <div>
+                                                <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
+                                                <button type="submit" name="action" value="qrcode" class="btn btn-kolping">QRCode</button>
+                                            </div>
                                             <div class="">
                                                 <input type="number" value="<?=$poll['poll_id']?>" name="poll_id" style="display: none;" required>
                                                 <button type="submit" name="action" value="mod" class="btn btn-kolping">Editieren</button>

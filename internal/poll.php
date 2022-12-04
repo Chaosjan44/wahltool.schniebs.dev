@@ -230,7 +230,7 @@ if (isset($_POST['action'])) {
         if (!$result) {
             error('Datenbank Fehler!', pdo_debugStrParams($stmt));
         } 
-        $stmt = $pdo->prepare("UPDATE polls_users SET answered_current = 0, refresh = 1, forcerefresh = 1 WHERE poll_id = ?");
+        $stmt = $pdo->prepare("UPDATE polls_users SET error_msg = '', answered_current = 0, refresh = 1, forcerefresh = 1 WHERE poll_id = ?");
         $stmt->bindValue(1, $_POST['poll_id']);
         $result = $stmt->execute();
         if (!$result) {

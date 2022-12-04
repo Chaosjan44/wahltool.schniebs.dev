@@ -1,6 +1,8 @@
 CREATE TABLE `groups` (
   `group_id` int(10) NOT NULL AUTO_INCREMENT,
   `group_name` varchar(255) NOT NULL,
+  `group_icon_dark` varchar(255),
+  `group_icon_light` varchar(255),
   PRIMARY KEY (`group_id`)
 );
 
@@ -55,6 +57,7 @@ CREATE TABLE `polls_users` (
   `answered_current` tinyint(1) NOT NULL DEFAULT 0,
   `refresh` tinyint(1),
   `forcerefresh` tinyint(1),
+  `error_msg` text,
   PRIMARY KEY (`poll_user_id`),
   FOREIGN KEY (`poll_id`) REFERENCES `polls` (`poll_id`)
 );
