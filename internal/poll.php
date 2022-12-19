@@ -334,13 +334,19 @@ if (isset($_POST['action'])) {
         require("templates/footer.php");
         exit;
 
-    // action to save an option of a question
+    // action to delete results of a question
     } else if ($_POST['action'] == 'poll_question_delete_results') {
         // set selected question of poll to current
         $stmt = $pdo->prepare("UPDATE options SET votes = 0 WHERE question_id = ?");
         $stmt->bindValue(1, $_POST['question_id']);
         $result = $stmt->execute();
         if (!$result) {
+            error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+        } 
+        $stmt = $pdo->prepare("UPDATE questions SET votes_given = 0 WHERE question_id = ?");
+        $stmt->bindValue(1, $_POST['question_id']);
+        $result2 = $stmt->execute();
+        if (!$result2) {
             error('Datenbank Fehler!', pdo_debugStrParams($stmt));
         } 
         print("<script>location.href='poll.php?edit=" . $_POST['poll_id'] . "'</script>");
