@@ -79,6 +79,7 @@ CREATE TABLE `questions` (
   `options_amount` int(8) NOT NULL,
   `current` tinyint(1) NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `votes_given` int(8),
   PRIMARY KEY (`question_id`),
   FOREIGN KEY (`poll_id`) REFERENCES `polls` (`poll_id`)
 );

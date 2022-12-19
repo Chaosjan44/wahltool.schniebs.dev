@@ -63,6 +63,12 @@ if (isset($_POST['action'])) {
                 if (!$result) {
                     error('Datenbank Fehler!', pdo_debugStrParams($stmt));
                 } 
+                $stmt = $pdo->prepare("UPDATE questions SET votes_given = votes_given + 1 WHERE question_id = ?");
+                $stmt->bindValue(1, $question["question_id"]);
+                $result0 = $stmt->execute();
+                if (!$result0) {
+                    error('Datenbank Fehler!', pdo_debugStrParams($stmt));
+                } 
                 $stmt = $pdo->prepare("UPDATE polls_users SET error_msg = '' WHERE poll_user_id = ?");
                 $stmt->bindValue(1, $poll_user['poll_user_id']);
                 $result2 = $stmt->execute();

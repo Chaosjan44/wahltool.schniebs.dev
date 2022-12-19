@@ -310,7 +310,7 @@ if (isset($_POST['action'])) {
                                     }
                                     foreach ($options as $option): 
                                         
-                                        $width = (($option['votes'] / $counter) * 100) * $question['options_amount'];
+                                        $width = (($option['votes'] / $question['votes_given']) * 100);
                                 ?>
                                     <tr>
                                         <td>
