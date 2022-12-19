@@ -295,6 +295,7 @@ if (isset($_POST['action'])) {
                 <div class="card cbg2">
                     <div class="card-body cbg2">
                         <div class="">
+                            <h2 class="text-end pe-2">Abgegebene Stimmen: <?=$question['votes_given']?></h2>
                             <table class="table align-middle table-borderless table-hover">                        
                                 <thead>
                                     <tr class="cbg2">
@@ -304,13 +305,9 @@ if (isset($_POST['action'])) {
                                 </thead>
                                 <tbody>
                                 <?php 
-                                    $counter;
-                                    foreach ($options as $option) {
-                                        $counter += $option['votes'];
-                                    }
                                     foreach ($options as $option): 
                                         
-                                        $width = (($option['votes'] / $question['votes_given']) * 100);
+                                        $width = ($option['votes'] / $question['votes_given']) * 100;
                                 ?>
                                     <tr>
                                         <td>
@@ -318,7 +315,7 @@ if (isset($_POST['action'])) {
                                         </td>
                                         <td>
                                             <div class="progress" style="height: 3vh;">
-                                                <div class="progress-bar kolping-orange" role="progressbar" aria-label="" style="width: <?=$width?>%;" aria-valuenow="<?=$option['votes']?>" aria-valuemin="0" aria-valuemax="<?=$vote_count['counter']?>"><?=$option['votes']?></div>
+                                                <div class="progress-bar kolping-orange" role="progressbar" aria-label="" style="width: <?=$width?>%;" aria-valuenow="<?=$option['votes']?>" aria-valuemin="0" aria-valuemax="<?=$question['votes_given']?>"><?=$option['votes']?></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -648,14 +645,6 @@ if (isset($_POST['action'])) {
                     } else {
                         $options = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     }
-                    $stmt = $pdo->prepare('SELECT count(poll_user_id) as counter FROM polls_users where answered_current = 1 and poll_id = ?');
-                    $stmt->bindValue(1, $question["poll_id"], PDO::PARAM_INT);
-                    $stmt->execute();
-                    if ($stmt->rowCount() < 1) {
-                        $vote_count['counter'] = "0";
-                    } else {
-                        $vote_count = $stmt->fetch();
-                    }
                 ?>
                     <div class="card cbg2 my-3 p-1">
                         <div class="card-body row">
@@ -677,7 +666,7 @@ if (isset($_POST['action'])) {
                             </div>
                             <div class="col justify-content-between d-flex">
                                 <h3 class="card-title text-start mb-0 mt-1">Optionen zur Auswahl: <?=$question['options_amount']?></h3>
-                                <h3 class="card-title text-end mb-0 mt-1">Personen die abgestimmt haben: <?=$vote_count['counter']?></h3>
+                                <h3 class="card-title text-end mb-0 mt-1">Personen die abgestimmt haben: <?=$question['votes_given']?></h3>
                             </div>
                             <p class="card-text">
                                 <?=$error_msg2?>
